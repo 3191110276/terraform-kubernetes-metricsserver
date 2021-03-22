@@ -1,1 +1,1 @@
-# terraform-kubernetes-metricsserver
+# Module for deploying the Kubernetes metrics server
