@@ -112,7 +112,6 @@ subjects:
 ---
   
 resource "kubernetes_service" "metrics-server" {
-  
   metadata {
     name = "metrics-server"
     namespace = "kube-system"
