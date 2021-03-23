@@ -148,11 +148,6 @@ resource "kubernetes_service" "metrics-server" {
   }
 }
 
-
-
-
-
-
 resource "kubernetes_deployment" "example" {
   metadata {
     name      = "metrics-server"
