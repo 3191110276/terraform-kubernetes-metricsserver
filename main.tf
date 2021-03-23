@@ -230,7 +230,7 @@ resource "kubernetes_deployment" "example" {
             failure_threshold = 3
         }
         
-        node_selector {
+        node_selector = {
           "kubernetes.io/os" = "linux"
         }
         
