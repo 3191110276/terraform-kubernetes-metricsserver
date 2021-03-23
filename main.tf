@@ -193,10 +193,23 @@ resource "kubernetes_deployment" "example" {
           image             = "k8s.gcr.io/metrics-server/metrics-server:v0.4.2"
           image_pull_policy = "IfNotPresent"
           
+          args = ["--cert-dir=/tmp", "--secure-port=4443", "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname", "--kubelet-use-node-status-port"]
+          
           port {
             name           = "https"
             container_port = 4443
             protocol       = "TCP"
+          }
+          
+          volume_mount {
+            name = "tmp-dir"
+            mount_path = "tmp-dir"
+          }
+          
+          security_context {
+            read_only_root_filesystem = true
+            run_as_non_root           = true
+            run_as_user               = 1000
           }
         }
         
@@ -230,28 +243,14 @@ resource "kubernetes_deployment" "example" {
         
         service_account_name = "metrics-server"
         
-        
+        volume {
+          name      = "tmp-dir"
+          empty_dir = {}
+        }
       }
     }
   }
 }
-
-      containers:
-      - args:
-        - --cert-dir=/tmp
-        - --secure-port=4443
-        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-        - --kubelet-use-node-status-port
-        securityContext:
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp-dir
-      volumes:
-      - emptyDir: {}
-        name: tmp-dir
 
 resource "kubernetes_api_service" "metrics-server" {
   metadata {
