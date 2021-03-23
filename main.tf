@@ -61,24 +61,30 @@ resource "kubernetes_cluster_role" "metrics-server" {
   }
 }
 
+resource "kubernetes_role_binding" "metrics-server-auth-reader" {
+  metadata {
+    name      = "metrics-server-auth-reader"
+    namespace = "kube-system"
+    
+    labels = {
+      "k8s-app" = "metrics-server"
+    }
+  }
+  
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = "extension-apiserver-authentication-reader"
+  }
+  
+  subject {
+    kind      = "ServiceAccount"
+    name      = "metrics-server"
+    namespace = "kube-system"
+  }
+}
 
 
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: metrics-server-auth-reader
-  namespace: kube-system
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: extension-apiserver-authentication-reader
-subjects:
-- kind: ServiceAccount
-  name: metrics-server
-  namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
