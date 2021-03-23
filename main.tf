@@ -110,21 +110,33 @@ subjects:
   name: metrics-server
   namespace: kube-system
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: metrics-server
-  namespace: kube-system
-spec:
-  ports:
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: https
-  selector:
-    k8s-app: metrics-server
+  
+resource "kubernetes_service" "metrics-server" {
+  
+  metadata {
+    name = "metrics-server"
+    namespace = "kube-system"
+    
+    labels = {
+      "k8s-app" = "metrics-server"
+    }
+  }
+  
+  spec {
+    selector = {
+      "k8s-app" = "metrics-server"
+    }
+    session_affinity = "ClientIP"
+    port {
+      name        = "https"
+      port        = 443
+      protocol    = "TCP"
+      target_port = 443
+    }
+  }
+}
+
+
 ---
 apiVersion: apps/v1
 kind: Deployment
