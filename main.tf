@@ -84,39 +84,46 @@ resource "kubernetes_role_binding" "metrics-server-auth-reader" {
   }
 }
 
+resource "kubernetes_cluster_role_binding" "auth-delegator" {
+  metadata {
+    name = "metrics-server:system:auth-delegator"
+    
+    labels = {
+      "k8s-app" = "metrics-server"
+    }
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:auth-delegator"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "metrics-server"
+    namespace = "kube-system"
+  }
+}
 
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: metrics-server:system:auth-delegator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:auth-delegator
-subjects:
-- kind: ServiceAccount
-  name: metrics-server
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: system:metrics-server
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:metrics-server
-subjects:
-- kind: ServiceAccount
-  name: metrics-server
-  namespace: kube-system
----
-  
+resource "kubernetes_cluster_role_binding" "metrics-server" {
+  metadata {
+    name = "system:metrics-server"
+    
+    labels = {
+      "k8s-app" = "metrics-server"
+    }
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:metrics-server"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "metrics-server"
+    namespace = "kube-system"
+  }
+}
+
 resource "kubernetes_service" "metrics-server" {
   metadata {
     name = "metrics-server"
@@ -203,11 +210,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: tmp-dir
----
-
-
-
-
 
 resource "kubernetes_api_service" "metrics-server" {
   metadata {
