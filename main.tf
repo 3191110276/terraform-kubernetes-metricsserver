@@ -149,53 +149,99 @@ resource "kubernetes_service" "metrics-server" {
 }
 
 
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: metrics-server
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: metrics-server
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 0
-  template:
-    metadata:
-      labels:
-        k8s-app: metrics-server
-    spec:
+
+
+
+
+resource "kubernetes_deployment" "example" {
+  metadata {
+    name      = "metrics-server"
+    namespace = "kube-system"
+    
+    labels = {
+      "k8s-app" = "metrics-server"
+    }
+  }
+
+  spec {
+    replicas = 1
+    
+    strategy = {
+      type = "RollingUpdate"
+      rolling_update = {
+        max_unavailable = 0
+      }
+    }
+
+    selector {
+      match_labels = {
+        "k8s-app" = "metrics-server"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          "k8s-app" = "metrics-server"
+        }
+      }
+
+      spec {
+        container {
+          name = "metrics-server"
+          
+          image             = "k8s.gcr.io/metrics-server/metrics-server:v0.4.2"
+          image_pull_policy = "IfNotPresent"
+          
+          port {
+            name           = "https"
+            container_port = 4443
+            protocol       = "TCP"
+          }
+        }
+        
+        liveness_probe {
+            http_get {
+              path   = "/livez"
+              port   = 443
+              scheme = "HTTPS"
+            }
+
+            period_seconds    = 10
+            failure_threshold = 3
+        }
+        
+        readiness_probe {
+            http_get {
+              path   = "/readyz"
+              port   = 443
+              scheme = "HTTPS"
+            }
+
+            period_seconds    = 10
+            failure_threshold = 3
+        }
+        
+        node_selector {
+          "kubernetes.io/os" = "linux"
+        }
+        
+        priority_class_name = "system-cluster-critical"
+        
+        service_account_name = "metrics-server"
+        
+        
+      }
+    }
+  }
+}
+
       containers:
       - args:
         - --cert-dir=/tmp
         - --secure-port=4443
         - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
         - --kubelet-use-node-status-port
-        image: k8s.gcr.io/metrics-server/metrics-server:v0.4.2
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /livez
-            port: https
-            scheme: HTTPS
-          periodSeconds: 10
-        name: metrics-server
-        ports:
-        - containerPort: 4443
-          name: https
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /readyz
-            port: https
-            scheme: HTTPS
-          periodSeconds: 10
         securityContext:
           readOnlyRootFilesystem: true
           runAsNonRoot: true
@@ -203,10 +249,6 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: tmp-dir
-      nodeSelector:
-        kubernetes.io/os: linux
-      priorityClassName: system-cluster-critical
-      serviceAccountName: metrics-server
       volumes:
       - emptyDir: {}
         name: tmp-dir
