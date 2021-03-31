@@ -161,7 +161,7 @@ resource "kubernetes_deployment" "example" {
   spec {
     replicas = 1
     
-    strategy = {
+    strategy {
       type = "RollingUpdate"
       rolling_update = {
         max_unavailable = 0
@@ -208,7 +208,7 @@ resource "kubernetes_deployment" "example" {
           }
         }
         
-        liveness_probe {
+        liveness_probe = {
             http_get {
               path   = "/livez"
               port   = 443
@@ -219,7 +219,7 @@ resource "kubernetes_deployment" "example" {
             failure_threshold = 3
         }
         
-        readiness_probe {
+        readiness_probe = {
             http_get {
               path   = "/readyz"
               port   = 443
@@ -240,7 +240,7 @@ resource "kubernetes_deployment" "example" {
         
         volume {
           name      = "tmp-dir"
-          empty_dir = {}
+          empty_dir {}
         }
       }
     }
