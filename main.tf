@@ -163,7 +163,7 @@ resource "kubernetes_deployment" "example" {
     
     strategy {
       type = "RollingUpdate"
-      rolling_update = {
+      rolling_update {
         max_unavailable = 0
       }
     }
@@ -208,8 +208,8 @@ resource "kubernetes_deployment" "example" {
           }
         }
         
-        liveness_probe = {
-            http_get = {
+        liveness_probe {
+            http_get {
               path   = "/livez"
               port   = 443
               scheme = "HTTPS"
@@ -219,8 +219,8 @@ resource "kubernetes_deployment" "example" {
             failure_threshold = 3
         }
         
-        readiness_probe = {
-            http_get = {
+        readiness_probe {
+            http_get {
               path   = "/readyz"
               port   = 443
               scheme = "HTTPS"
