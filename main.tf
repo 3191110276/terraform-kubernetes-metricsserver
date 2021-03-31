@@ -206,28 +206,28 @@ resource "kubernetes_deployment" "example" {
             run_as_non_root           = true
             run_as_user               = 1000
           }
-        }
-        
-        liveness_probe {
-          http_get {
-            path   = "/livez"
-            port   = 443
-            scheme = "HTTPS"
-          }
-
-          period_seconds    = 10
-          failure_threshold = 3
-        }
-        
-        readiness_probe {
+          
+          liveness_probe {
             http_get {
-              path   = "/readyz"
+              path   = "/livez"
               port   = 443
               scheme = "HTTPS"
             }
 
             period_seconds    = 10
             failure_threshold = 3
+          }
+        
+          readiness_probe {
+              http_get {
+                path   = "/readyz"
+                port   = 443
+                scheme = "HTTPS"
+              }
+
+              period_seconds    = 10
+              failure_threshold = 3
+          }
         }
         
         node_selector = {
