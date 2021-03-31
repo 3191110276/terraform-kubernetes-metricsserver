@@ -209,7 +209,7 @@ resource "kubernetes_deployment" "example" {
         }
         
         liveness_probe = {
-            http_get {
+            http_get = {
               path   = "/livez"
               port   = 443
               scheme = "HTTPS"
@@ -220,7 +220,7 @@ resource "kubernetes_deployment" "example" {
         }
         
         readiness_probe = {
-            http_get {
+            http_get = {
               path   = "/readyz"
               port   = 443
               scheme = "HTTPS"
