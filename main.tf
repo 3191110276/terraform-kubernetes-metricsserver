@@ -198,7 +198,7 @@ resource "kubernetes_deployment" "metrics-server" {
           
           volume_mount {
             name = "tmp-dir"
-            mount_path = "tmp-dir"
+            mount_path = "/tmp"
           }
           
           security_context {
