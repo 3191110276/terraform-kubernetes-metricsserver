@@ -210,7 +210,7 @@ resource "kubernetes_deployment" "metrics-server" {
           liveness_probe {
             http_get {
               path   = "/livez"
-              port   = 443
+              port   = 4443
               scheme = "HTTPS"
             }
 
@@ -221,7 +221,7 @@ resource "kubernetes_deployment" "metrics-server" {
           readiness_probe {
               http_get {
                 path   = "/readyz"
-                port   = 443
+                port   = 4443
                 scheme = "HTTPS"
               }
 
