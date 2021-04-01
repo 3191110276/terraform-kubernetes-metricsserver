@@ -148,7 +148,7 @@ resource "kubernetes_service" "metrics-server" {
   }
 }
 
-resource "kubernetes_deployment" "example" {
+resource "kubernetes_deployment" "metrics-server" {
   metadata {
     name      = "metrics-server"
     namespace = "kube-system"
