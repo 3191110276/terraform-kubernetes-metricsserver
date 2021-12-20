@@ -242,6 +242,13 @@ resource "kubernetes_deployment" "metrics-server" {
           name      = "tmp-dir"
           empty_dir {}
         }
+        
+        resources {
+          requests {
+            cpu    = "100m"
+            memory = "200Mi"
+          }
+        }
       }
     }
   }
