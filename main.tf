@@ -196,6 +196,13 @@ resource "kubernetes_deployment" "metrics-server" {
             protocol       = "TCP"
           }
           
+          resources {
+            requests = {
+              cpu    = "100m"
+              memory = "200Mi"
+            }
+          }
+          
           volume_mount {
             name = "tmp-dir"
             mount_path = "/tmp"
@@ -241,13 +248,6 @@ resource "kubernetes_deployment" "metrics-server" {
         volume {
           name      = "tmp-dir"
           empty_dir {}
-        }
-        
-        resources {
-          requests {
-            cpu    = "100m"
-            memory = "200Mi"
-          }
         }
       }
     }
