@@ -149,6 +149,11 @@ resource "kubernetes_service" "metrics-server" {
 }
 
 resource "kubernetes_deployment" "metrics-server" {
+  
+  timeouts {
+    create = "3600s"
+  }
+  
   metadata {
     name      = "metrics-server"
     namespace = "kube-system"
